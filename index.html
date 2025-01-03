@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <title>记忆工具</title>
     <meta name="renderer" content="webkit|ie-comp|ie-stand">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport"
@@ -14,32 +15,56 @@
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
             crossorigin="anonymous"></script>
     <style>
+        #error{
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 <div class="container mt-4">
-    <table class="table table-bordered" id="table">
+    <table class="table table-bordered table-responsive" id="table">
         <tbody>
         </tbody>
     </table>
+
+    <div style="width: 100%">
+         <div id="error"></div>
+    </div>
 </div>
 
 <script>
+    var data = [
+        ["0", "", "", "", "", "5", "", "7", "", "9", "", "", "12"],
+        ["E", "F", "", "G", "", "A", "", "B", "C", "", "D", "", "E"],
+        ["B", "C", "", "D", "", "E", "F", "", "G", "", "A", "", "B"],
+        ["G", "", "A", "", "B", "C", "", "D", "", "E", "F", "", "G"],
+        ["D", "", "E", "F", "", "G", "", "A", "", "B", "C", "", "D"],
+        ["A", "", "B", "C", "", "D", "", "E", "F", "", "G", "", "A"],
+        ["E", "F", "", "G", "", "A", "", "B", "C", "", "D", "", "E"]
+    ];
+
+
+    function get_rand_value() {
+        for (var i = 0; i < 20; i++) {
+            var x = Math.floor(Math.random() * 6) + 1;
+            var y = Math.floor(Math.random() * 11) + 1;
+            if (y<2){
+                continue
+            }
+            var value = data[x][y]
+            if (value != "" && value != undefined) {
+                return [x, y]
+            } else {
+                console.log("value:", value)
+            }
+        }
+        return [5, 5]
+    }
+
+    // 填充表格的 tbody
     function set_data(show_value) {
-        var data = [
-            ["0", "", "", "", "", "5", "", "7", "", "9", "", "", "12"],
-            ["E", "F", "", "G", "", "A", "", "B", "C", "", "D", "", "E"],
-            ["B", "C", "", "D", "", "E", "F", "", "G", "", "A", "", "B"],
-            ["G", "", "A", "", "B", "C", "", "D", "", "E", "F", "", "G"],
-            ["D", "", "E", "F", "", "G", "", "A", "", "B", "C", "", "D"],
-            ["A", "", "B", "C", "", "D", "", "E", "F", "", "G", "", "A"],
-            ["E", "F", "", "G", "", "A", "", "B", "C", "", "D", "", "E"]
-        ];
-
-        // 填充表格的 tbody
         var tbody = $('#table tbody');
-
-        // 遍历数据并生成表格行
+        var rand_value = get_rand_value()
         for (var i = 0; i < data.length; i++) {
             var w = 10
             var row = $('<tr style="text-align: center">'); // 创建新的一行
@@ -47,7 +72,7 @@
                 var style = ""
                 var td_value = data[i][j]
                 if (j != 0 && i == 0) {
-                    w = w - 0.4
+                    w = w - 0.33
                     style = "width:" + w.toString() + "%"
                 }
                 var td_html = '<td value="' + td_value + '" style="' + style + '"></td>'
@@ -55,9 +80,13 @@
                 if (show_value) {
                     cell = $(td_html).text(td_value); // 创建新的一格
                 } else {
-                    cell = $(td_html).text("");
+                    if (i == rand_value[0] && j == rand_value[1]) {
+                        cell = $(td_html).text(td_value); // 随机显示一个音
+                    } else {
+                        cell = $(td_html).text("");
+                    }
                     if (j == 0 || i == 0) {
-                        cell = $(td_html).text(td_value);
+                        cell = $(td_html).text(td_value); // 只显示品
                     }
                 }
 
@@ -84,10 +113,14 @@
             input.focus();
 
             input.blur(function () { // 获取输入内容
-                var updatedText = input.val();
-                if ($td.attr('value') != updatedText) {
+                var updatedText = input.val().trim().toUpperCase();
+                var attr_value = $td.attr('value').toUpperCase()
+                if (attr_value != updatedText) {
                     $td.html("X");
+                    $("#error").text("["+attr_value+"|"+updatedText+"]")
                 } else {
+                    $("#error").text("")
+                    console.log(attr_value,updatedText)
                     $td.html(updatedText);
                 }
             });
