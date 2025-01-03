@@ -115,6 +115,10 @@
             input.blur(function () { // 获取输入内容
                 var updatedText = input.val().trim().toUpperCase();
                 var attr_value = $td.attr('value').toUpperCase()
+                if(updatedText==""){
+                    $td.html("");
+                    return
+                }
                 if (attr_value != updatedText) {
                     $td.html("X");
                     $("#error").text("["+attr_value+"|"+updatedText+"]")
